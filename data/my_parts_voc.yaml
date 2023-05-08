@@ -1,0 +1,22 @@
+# YOLOv5 🚀 by Ultralytics, AGPL-3.0 license
+# PASCAL VOC dataset http://host.robots.ox.ac.uk/pascal/VOC by University of Oxford
+# Example usage: python train.py --data VOC.yaml
+# parent
+# ├── yolov5
+# └── datasets
+#     └── VOC  ← downloads here (2.8 GB)
+
+
+# Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
+train: D:/CodeLib/yolov5-master/datasets/images/train  # train images (relative to 'path')  16551 images
+val: D:/CodeLib/yolov5-master/datasets/images/val  # val images (relative to 'path')  4952 images
+#test: # test images (optional)
+#  - images/test
+
+# Number of classes
+nc: 30
+
+# Classes names
+names: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+          '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+          '21', '22', '23', '24', '25', '26', '27', '28', '29', '30']
