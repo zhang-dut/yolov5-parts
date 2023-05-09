@@ -1,5 +1,3 @@
-# yolov5-pt
-=======
 <div align="center">
   <p>
     <a align="center" href="https://ultralytics.com/yolov5" target="_blank">
