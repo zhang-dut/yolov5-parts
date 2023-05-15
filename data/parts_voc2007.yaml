@@ -14,9 +14,10 @@ val: ../datasets/images/val  # val images (relative to 'path')  4952 images
 #  - images/test
 
 # Number of classes
-nc: 30
+nc: 20
 
 # Classes names
-names: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
-          '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
-          '21', '22', '23', '24', '25', '26', '27', '28', '29', '30']
+names: ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle',
+        'bus', 'car', 'cat', 'chair', 'cow',
+        'diningtable', 'dog', 'horse', 'motorbike', 'person',
+        'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
