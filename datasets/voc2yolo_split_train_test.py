@@ -7,13 +7,13 @@ import random
 from shutil import copyfile
 
 # classes = ["hat", "person"]
-# classes=["aeroplane", "bicycle", "bird", "boat", "bottle",
-#          "bus", "car", "cat", "chair", "cow",
-#          "diningtable", "dog", "horse", "motorbike", "person",
-#          "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
-classes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
-           '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
-           '21', '22', '23', '24', '25', '26', '27', '28', '29', '30']
+classes=['aeroplane', 'bicycle', 'bird', 'boat', 'bottle',
+         'bus', 'car', 'cat', 'chair', 'cow',
+         'diningtable', 'dog', 'horse', 'motorbike', 'person',
+         'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
+# classes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+#            '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+#            '21', '22', '23', '24', '25', '26', '27', '28', '29', '30']
 
 TRAIN_RATIO = 80
 
@@ -44,8 +44,8 @@ def convert(size, box):
 
 
 def convert_annotation(image_id):
-    in_file = open('T-LESS_VOC/Annotations/%s.xml' % image_id)
-    out_file = open('T-LESS_VOC/YOLOLabels/%s.txt' % image_id, 'w')
+    in_file = open('VOC2007/Annotations/%s.xml' % image_id)
+    out_file = open('VOC2007/YOLOLabels/%s.txt' % image_id, 'w')
     tree = ET.parse(in_file)
     root = tree.getroot()
     size = root.find('size')
@@ -72,14 +72,14 @@ wd = os.getcwd()
 data_base_dir = os.path.join(wd, "../datasets/")
 if not os.path.isdir(data_base_dir):
     os.mkdir(data_base_dir)
-work_sapce_dir = os.path.join(data_base_dir, "T-LESS_VOC/")
+work_sapce_dir = os.path.join(data_base_dir, "VOC2007/")
 if not os.path.isdir(work_sapce_dir):
     os.mkdir(work_sapce_dir)
 annotation_dir = os.path.join(work_sapce_dir, "Annotations/")
 if not os.path.isdir(annotation_dir):
     os.mkdir(annotation_dir)
 clear_hidden_files(annotation_dir)
-image_dir = os.path.join(work_sapce_dir, "PNGImages/")
+image_dir = os.path.join(work_sapce_dir, "JPEGImages/")
 if not os.path.isdir(image_dir):
     os.mkdir(image_dir)
 clear_hidden_files(image_dir)
@@ -148,4 +148,3 @@ for i in range(0, len(list_imgs)):
             copyfile(label_path, yolov5_labels_test_dir + label_name)
 train_file.close()
 test_file.close()
-
