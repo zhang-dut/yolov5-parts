@@ -34,7 +34,7 @@ for folder_name in folder_list:  # 分文件夹进行
     with open(gt_file) as f:
         gt_dict = yaml.load(f, Loader=yaml.FullLoader)
 
-    for k in list(gt_dict.keys())[:1295]:  # 第 k 幅图片, 前300张
+    for k in list(gt_dict.keys())[:1295:5]:  # 第 k 幅图片, 前300张
         gt_k_imgid_v_nbbox[k] = []
 
         img_i_gt = gt_dict[k]
