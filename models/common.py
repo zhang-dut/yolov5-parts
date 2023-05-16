@@ -869,3 +869,47 @@ class Classify(nn.Module):
         if isinstance(x, list):
             x = torch.cat(x, 1)
         return self.linear(self.drop(self.pool(self.conv(x)).flatten(1)))
+
+
+# ================================
+# Required classes in MobileNetV2
+# ================================
+class ConvBNReLU6(nn.Sequential):
+    # 该函数主要做卷积、池化、ReLU6激活操作
+    def __init__(self, in_channel, out_channel, kernel_size=3, stride=1, groups=1):
+        padding = (kernel_size - 1) // 2 # 池化 = (步长-1)整除2
+        super(ConvBNReLU6, self).__init__(  # 调用ConvBNReLU父类添加模块
+            nn.Conv2d(in_channel, out_channel, kernel_size, stride, padding, groups=groups, bias=False),
+            # bias默认为False
+            nn.BatchNorm2d(out_channel),
+            nn.ReLU6(inplace=True)
+        )
+
+
+class InvertedResidual(nn.Module):
+    # 该模块主要实现了倒残差模块
+    def __init__(self, in_channel, out_channel, stride, expand_ratio):
+        super(InvertedResidual, self).__init__()
+        hidden_channel = in_channel * expand_ratio  # 由于有到残差模块有1*1，3*3的卷积模块，所以可以靠expand_rarton来进行升维
+        # 残差连接的判断条件：当步长=1且输入矩阵与输出矩阵的shape相同时进行
+        self.use_shortcut = stride == 1 and in_channel == out_channel
+
+        layers = []
+        if expand_ratio != 1:  # 如果expand_ratio不等于1，要做升维操作
+            # 1x1 pointwise conv
+            layers.append(ConvBNReLU6(in_channel, hidden_channel, kernel_size=1))
+        layers.extend([
+            # 3x3 depthwise conv，步长可能是1也可能是2，groups=hidden_channel表示这里使用了分组卷积的操作
+            ConvBNReLU6(hidden_channel, hidden_channel, stride=stride, groups=hidden_channel),
+            # 1x1 pointwise conv(linear)
+            nn.Conv2d(hidden_channel, out_channel, kernel_size=1, bias=False),
+            nn.BatchNorm2d(out_channel),
+        ])
+
+        self.conv = nn.Sequential(*layers)  # 将layers列表中的元素解开依次传入nn.Sequential
+
+    def forward(self, x):
+        if self.use_shortcut:  # 如果使用了残差连接，就会进行一个x+的操作
+            return x + self.conv(x)
+        else:
+            return self.conv(x)
