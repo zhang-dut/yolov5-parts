@@ -12,7 +12,7 @@ anchors:
 
 # YOLOv5 backbone - MobileNetV3-Large 15层
 backbone:
-  # MobileNet_Block: [out_ch, hidden_ch, kernel_size, stride, use_se, use_hs]
+  # MobileNetBlock: [out_ch, hidden_ch, kernel_size, stride, use_se, use_hs]
   # hidden_ch表示在Inverted residuals中的扩张通道数
   # use_se 表示是否使用SELayer, use_hs 表示使用h_swish还是ReLU
   # [from, number, module, args]
