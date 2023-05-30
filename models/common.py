@@ -23,7 +23,7 @@ import torch
 import torch.nn as nn
 from PIL import Image
 from torch.cuda import amp
-from timm.models.layers import DropPath  # FasterNet所需库
+# from timm.models.layers import DropPath  # FasterNet所需库
 
 from utils import TryExcept
 from utils.dataloaders import exif_transpose, letterbox
