@@ -324,6 +324,7 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
     na = (len(anchors[0]) // 2) if isinstance(anchors, list) else anchors  # number of anchors
     no = na * (nc + 5)  # number of outputs = anchors * (classes + 5)
 
+    is_backbone = False
     layers, save, c2 = [], [], ch[-1]  # layers, savelist, ch out
     for i, (f, n, m, args) in enumerate(d['backbone'] + d['head']):  # from, number, module, args
         try:
@@ -353,20 +354,14 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
 
             args = [c1, c2, *args[1:]]
             if m in {
-                    BottleneckCSP, C3, C3TR, C3Ghost, C3x,
-                    ST2CSPA, ST2CSPB, ST2CSPC  # SwinTransformerV2/*3
+                BottleneckCSP, C3, C3TR, C3Ghost, C3x,
+                ST2CSPA, ST2CSPB, ST2CSPC  # SwinTransformerV2/*3
             }:
                 args.insert(2, n)  # number of repeats
                 n = 1
         elif m is nn.BatchNorm2d:
             args = [ch[f]]
-        elif m is CoordAttention:  # add CoordAttention
-            args = [ch[f]]
-        elif m is CBAMBlock:  # add CBAM attention
-            args = [ch[f]]
-        elif m is ECAAttention:  # add ECA attention
-            args = [ch[f]]
-        elif m is SEAttention:  # add SE attention
+        elif m in {CoordAttention, CBAMBlock, ECAAttention, SEAttention}:  # add CA/CBAM/ECA/SE attention
             args = [ch[f]]
         elif m is Concat:
             c2 = sum(ch[x] for x in f)
@@ -383,14 +378,13 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
             c2 = ch[f] // args[0] ** 2
         elif isinstance(m, str):
             t = m
-            m = timm.create_model(m, pretrained=args[0], feature_only=True)
+            m = timm.create_model(m, pretrained=args[0], features_only=True)
             c2 = m.feature_info.channels()
         elif m in {fasternet_t0, fasternet_t1, fasternet_t2, fasternet_s, fasternet_m, fasternet_l}:
             m = m(*args)
             c2 = m.channel
         else:
             c2 = ch[f]
-
         if isinstance(c2, list):
             is_backbone = True
             m_ = m
@@ -399,9 +393,9 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
             m_ = nn.Sequential(*(m(*args) for _ in range(n))) if n > 1 else m(*args)  # module
             t = str(m)[8:-2].replace('__main__.', '')  # module type
         np = sum(x.numel() for x in m_.parameters())  # number params
-        m_.i, m_.f, m_.type, m_.np = i, f, t, np  # attach index, 'from' index, type, number params
+        m_.i, m_.f, m_.type, m_.np = i + 4 if is_backbone else i, f, t, np  # attach index, 'from' index, type, number params
         LOGGER.info(f'{i:>3}{str(f):>18}{n_:>3}{np:10.0f}  {t:<40}{str(args):<30}')  # print
-        save.extend(x % i for x in ([f] if isinstance(f, int) else f) if x != -1)  # append to savelist
+        save.extend(x % (i + 4 if is_backbone else i) for x in ([f] if isinstance(f, int) else f) if x != -1)  # append to savelist
         layers.append(m_)
         if i == 0:
             ch = []
@@ -410,17 +404,17 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
             for _ in range(5 - len(ch)):
                 ch.insert(0, 0)
         else:
-            ch.insert(0, 0)
+            ch.append(c2)
     return nn.Sequential(*layers), sorted(save)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cfg', type=str, default='yolov5s.yaml', help='model.yaml')
+    parser.add_argument('--cfg', type=str, default='yolov5-custom.yaml', help='model.yaml')
     parser.add_argument('--batch-size', type=int, default=1, help='total batch size for all GPUs')
     parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     parser.add_argument('--profile', action='store_true', help='profile model speed')
-    parser.add_argument('--line-profile', action='store_true', help='profile model speed layer by layer')
+    parser.add_argument('--line-profile', action='store_true', default=True, help='profile model speed layer by layer')
     parser.add_argument('--test', action='store_true', help='test all yolo*.yaml')
     opt = parser.parse_args()
     opt.cfg = check_yaml(opt.cfg)  # check YAML
