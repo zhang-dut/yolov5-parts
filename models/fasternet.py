@@ -259,6 +259,7 @@ class FasterNet(nn.Module):
             self.add_module(layer_name, layer)
         
         self.channel = [i.size(1) for i in self.forward(torch.randn(1, 3, 640, 640))]
+
     def forward(self, x: Tensor) -> Tensor:
         # output the features of four stages for dense prediction
         x = self.patch_embed(x)
@@ -271,6 +272,7 @@ class FasterNet(nn.Module):
                 outs.append(x_out)
         return outs
 
+
 def update_weight(model_dict, weight_dict):
     idx, temp_dict = 0, {}
     for k, v in weight_dict.items():
@@ -281,6 +283,7 @@ def update_weight(model_dict, weight_dict):
     print(f'loading weights... {idx}/{len(model_dict)} items')
     return model_dict
 
+
 def fasternet_t0(weights=None, cfg='models/fasternet_cfg/fasternet_t0.yaml'):
     with open(cfg) as f:
         cfg = yaml.load(f, Loader=yaml.SafeLoader)
@@ -289,6 +292,7 @@ def fasternet_t0(weights=None, cfg='models/fasternet_cfg/fasternet_t0.yaml'):
         pretrain_weight = torch.load(weights, map_location='cpu')
         model.load_state_dict(update_weight(model.state_dict(), pretrain_weight))
     return model
+
 
 def fasternet_t1(weights=None, cfg='models/fasternet_cfg/fasternet_t1.yaml'):
     with open(cfg) as f:
@@ -299,6 +303,7 @@ def fasternet_t1(weights=None, cfg='models/fasternet_cfg/fasternet_t1.yaml'):
         model.load_state_dict(update_weight(model.state_dict(), pretrain_weight))
     return model
 
+
 def fasternet_t2(weights=None, cfg='models/fasternet_cfg/fasternet_t2.yaml'):
     with open(cfg) as f:
         cfg = yaml.load(f, Loader=yaml.SafeLoader)
@@ -307,6 +312,7 @@ def fasternet_t2(weights=None, cfg='models/fasternet_cfg/fasternet_t2.yaml'):
         pretrain_weight = torch.load(weights, map_location='cpu')
         model.load_state_dict(update_weight(model.state_dict(), pretrain_weight))
     return model
+
 
 def fasternet_s(weights=None, cfg='models/fasternet_cfg/fasternet_s.yaml'):
     with open(cfg) as f:
@@ -317,7 +323,8 @@ def fasternet_s(weights=None, cfg='models/fasternet_cfg/fasternet_s.yaml'):
         model.load_state_dict(update_weight(model.state_dict(), pretrain_weight))
     return model
 
-def fasternet_m(weights=None, cfg='models/fasternet_cfg/fasternet_m.yaml'):
+
+def fasternet_m(weights=None, cfg='fmodels/asternet_cfg/fasternet_m.yaml'):
     with open(cfg) as f:
         cfg = yaml.load(f, Loader=yaml.SafeLoader)
     model = FasterNet(**cfg)
@@ -326,7 +333,8 @@ def fasternet_m(weights=None, cfg='models/fasternet_cfg/fasternet_m.yaml'):
         model.load_state_dict(update_weight(model.state_dict(), pretrain_weight))
     return model
 
-def fasternet_l(weights=None, cfg='models/fasternet_cfg/fasternet_l.yaml'):
+
+def fasternet_l(weights=None, cfg='models/fasternet_cfg/fasternet_s.yaml'):
     with open(cfg) as f:
         cfg = yaml.load(f, Loader=yaml.SafeLoader)
     model = FasterNet(**cfg)
@@ -334,6 +342,7 @@ def fasternet_l(weights=None, cfg='models/fasternet_cfg/fasternet_l.yaml'):
         pretrain_weight = torch.load(weights, map_location='cpu')
         model.load_state_dict(update_weight(model.state_dict(), pretrain_weight))
     return model
+
 
 if __name__ == '__main__':
     import yaml
