@@ -138,8 +138,19 @@ class ComputeLoss:
                 pxy = pxy.sigmoid() * 2 - 0.5
                 pwh = (pwh.sigmoid() * 2) ** 2 * anchors[i]
                 pbox = torch.cat((pxy, pwh), 1)  # predicted box
-                iou = bbox_iou(pbox, tbox[i], CIoU=True).squeeze()  # iou(prediction, target)
-                lbox += (1.0 - iou).mean()  # iou loss
+                # iou = bbox_iou(pbox, tbox[i], DIoU=True).squeeze()  # iou(prediction, target)
+                # lbox += (1.0 - iou).mean()  # iou loss
+                iou = bbox_iou(pbox, tbox[i], CIoU=True)  # iou(prediction, target)
+                if type(iou) is tuple:
+                    if len(iou) == 2:
+                        lbox += (iou[1].detach().squeeze() * (1 - iou[0].squeeze())).mean()
+                        iou = iou[0].squeeze()
+                    else:
+                        lbox += (iou[0] * iou[1]).mean()
+                        iou = iou[2].squeeze()
+                else:
+                    lbox += (1.0 - iou.squeeze()).mean()  # iou loss
+                    iou = iou.squeeze()
 
                 # Objectness
                 iou = iou.detach().clamp(0).type(tobj.dtype)
