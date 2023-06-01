@@ -50,6 +50,7 @@ VOC/
 # Neural Network weights -----------------------------------------------------------------------------------------------
 *.weights
 *.pt
+*.pth
 *.pb
 *.onnx
 *.engine
@@ -256,3 +257,4 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 /datasets/
+/weights/*.pth
