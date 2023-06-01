@@ -23,11 +23,11 @@ if platform.system() != 'Windows':
     ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 from models.common import *
-from models.fasternet import *
 from models.common_ca import CoordAttention
 from models.common_cbam import CBAMBlock
 from models.common_eca import ECAAttention
 from models.common_se import SEAttention
+from models.fasternet import *
 
 from models.experimental import *
 from utils.autoanchor import check_anchor_order
