@@ -18,7 +18,7 @@ anchors:
 # YOLOv5 v6.0 backbone
 backbone:
   # [from, number, module, args]
-  [[-1, 1, vovnet39a, [False]], # 4
+  [[-1, 1, fasternet_s, [../weights/fasternet_s-epoch.299-val_acc1.81.2840.pth]], # 4
    [-1, 1, SPPF, [1024, 5]],  # 5
   ]
 
